@@ -210,11 +210,11 @@ if __name__=='__main__':
     interval = sys.argv[2]
 
     # use the connection to get the required data: _d
-    dr_d = rq.date_range(mysql_con, date, interval=7)
-    wpb_d = rq.weekly_priority_breakdown(mysql_con, date, interval=7)
-    wtb_d = rq.weekly_time_breakdown(mysql_con, date, interval=7)
-    wttb_d = rq.weekly_total_time_breakdown(mysql_con, date, interval=7)
-    wsb_d = rq.weekly_subsystem_breakdown(mysql_con, date, interval=7)
+    dr_d = rq.date_range(mysql_con, date, interval=interval)
+    wpb_d = rq.weekly_priority_breakdown(mysql_con, date, interval=interval)
+    wtb_d = rq.weekly_time_breakdown(mysql_con, date, interval=interval)
+    wttb_d = rq.weekly_total_time_breakdown(mysql_con, date, interval=interval)
+    wsb_d = rq.weekly_subsystem_breakdown(mysql_con, date, interval=interval)
 
     # TESTING: save the dataframes
     dr_d.save('dr_d')

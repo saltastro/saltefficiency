@@ -20,7 +20,7 @@ import numpy as np
 import matplotlib.dates as mdates
 
 
-def priority_breakdown_pie_chart(x, ds):
+def priority_breakdown_pie_chart(x, ds, dirname='./logs/'):
     '''
     make a pie chart from the dataframe
     '''
@@ -50,11 +50,11 @@ def priority_breakdown_pie_chart(x, ds):
 
     ax.set_title(title_txt, fontsize=12)
 
-    filename = 'priority_breakdown_pie_chart_' +'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
+    filename = dirname+'priority_breakdown_pie_chart_' +'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
     pl.savefig(filename, dpi=100)
 #    pl.show()
 
-def weekly_total_time_breakdown_pie_chart(x, ds):
+def weekly_total_time_breakdown_pie_chart(x, ds, dirname='./logs/'):
 
     labels = ['Science - {}'.format(x['ScienceTime'][0]),
               'Engineering - {}'.format(x['EngineeringTime'][0]),
@@ -87,10 +87,10 @@ def weekly_total_time_breakdown_pie_chart(x, ds):
     ax.set_title(title_txt, fontsize=12)
 
     filename = 'weekly_total_time_breakdown_pie_chart_' + '-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
-def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds):
+def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds, dirname='./logs/'):
 
 
     subsystem = list(x['SaltSubsystem'])
@@ -120,10 +120,10 @@ def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds):
     ax.set_title(title_txt, fontsize=12)
 
     filename = 'weekly_subsystem_breakdown_pie_chart_'+'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
-def weekly_time_breakdown(x, ds):
+def weekly_time_breakdown(x, ds, dirname='./logs/'):
     '''
     produce a bar stacked bar chart plot of the time breakdown per day for the
     past week.
@@ -193,7 +193,7 @@ def weekly_time_breakdown(x, ds):
                       wspace=None, hspace=None)
     pl.autoscale()
     filename = 'weekly_time_breakdown_'+'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
 

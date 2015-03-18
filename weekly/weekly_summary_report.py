@@ -133,7 +133,7 @@ def print_to_screen(txt):
 
     return
 
-def write_to_file(dr, txt):
+def write_to_file(dr, txt, dirname='./logs/'):
     '''
     this function writes the text to a file and names the report accorting
     to the date range specified
@@ -147,7 +147,7 @@ def write_to_file(dr, txt):
 ****************** End of Weekly Report *********************
 '''
 
-    with open(filename, 'w') as f:
+    with open(dirname+filename, 'w') as f:
         f.write(txt + ftr)
 
 def commandLine(argv):

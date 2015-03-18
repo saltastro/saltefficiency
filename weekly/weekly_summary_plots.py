@@ -9,7 +9,7 @@ case things change in the future should prevent issues with the pis chart
 colours
 
 """
-
+import os
 import pandas as pd
 import pandas.io.sql as psql
 import MySQLdb
@@ -216,7 +216,7 @@ if __name__=='__main__':
                 passwd=os.environ['SDBPASS'], db='sdb')
 
     date = '2015-03-16'
-    interval = 7
+    interval = 105
 
     # use the connection to get the required data: _d
     dr_d = rq.date_range(mysql_con, date, interval=7)

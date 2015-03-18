@@ -11,7 +11,7 @@ The script runs from today and queries the sdb for data going back 7 days.
 
 """
 
-
+import os
 import pandas as pd
 import pandas.io.sql as psql
 import MySQLdb

@@ -9,7 +9,8 @@ case things change in the future should prevent issues with the pis chart
 colours
 
 """
-
+import sys
+import os
 import pandas as pd
 import pandas.io.sql as psql
 import MySQLdb
@@ -19,7 +20,7 @@ import numpy as np
 import matplotlib.dates as mdates
 
 
-def priority_breakdown_pie_chart(x, ds):
+def priority_breakdown_pie_chart(x, ds, dirname='./logs/'):
     '''
     make a pie chart from the dataframe
     '''
@@ -49,11 +50,11 @@ def priority_breakdown_pie_chart(x, ds):
 
     ax.set_title(title_txt, fontsize=12)
 
-    filename = 'priority_breakdown_pie_chart_' +'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
+    filename = dirname+'priority_breakdown_pie_chart_' +'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
     pl.savefig(filename, dpi=100)
 #    pl.show()
 
-def weekly_total_time_breakdown_pie_chart(x, ds):
+def weekly_total_time_breakdown_pie_chart(x, ds, dirname='./logs/'):
 
     labels = ['Science - {}'.format(x['ScienceTime'][0]),
               'Engineering - {}'.format(x['EngineeringTime'][0]),
@@ -86,10 +87,10 @@ def weekly_total_time_breakdown_pie_chart(x, ds):
     ax.set_title(title_txt, fontsize=12)
 
     filename = 'weekly_total_time_breakdown_pie_chart_' + '-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
-def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds):
+def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds, dirname='./logs/'):
 
 
     subsystem = list(x['SaltSubsystem'])
@@ -119,10 +120,10 @@ def weekly_subsystem_breakdown_pie_chart(x, y, col_dict, ds):
     ax.set_title(title_txt, fontsize=12)
 
     filename = 'weekly_subsystem_breakdown_pie_chart_'+'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
-def weekly_time_breakdown(x, ds):
+def weekly_time_breakdown(x, ds, dirname='./logs/'):
     '''
     produce a bar stacked bar chart plot of the time breakdown per day for the
     past week.
@@ -192,12 +193,11 @@ def weekly_time_breakdown(x, ds):
                       wspace=None, hspace=None)
     pl.autoscale()
     filename = 'weekly_time_breakdown_'+'-'.join([ds.split()[0].replace('-',''), ds.split()[2].replace('-','')])+'.png'
-    pl.savefig(filename, dpi=100)
+    pl.savefig(dirname+filename, dpi=100)
 #    pl.show()
 
 
 if __name__=='__main__':
-    import os
     # set the colours for all the subsystems:
     subsystems_list = ['BMS', 'DOME', 'TC', 'PMAS', 'SCAM', 'TCS', 'STRUCT',
                        'TPC', 'HRS', 'PFIS','Proposal', 'Operations',
@@ -215,8 +215,9 @@ if __name__=='__main__':
                 port=3306,user=os.environ['SDBUSER'], 
                 passwd=os.environ['SDBPASS'], db='sdb')
 
-    date = '2015-03-16'
-    interval = 7
+    obsdate = sys.argv[1]
+    date = '{}-{}-{}'.format(obsdate[0:4], obsdate[4:6], obsdate[6:8])
+    interval = sys.argv[2]
 
     # use the connection to get the required data: _d
     dr_d = rq.date_range(mysql_con, date, interval=7)

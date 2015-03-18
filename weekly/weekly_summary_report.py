@@ -11,7 +11,8 @@ The script runs from today and queries the sdb for data going back 7 days.
 
 """
 
-
+import os
+import sys
 import pandas as pd
 import pandas.io.sql as psql
 import MySQLdb
@@ -132,7 +133,7 @@ def print_to_screen(txt):
 
     return
 
-def write_to_file(dr, txt):
+def write_to_file(dr, txt, dirname='./logs/'):
     '''
     this function writes the text to a file and names the report accorting
     to the date range specified
@@ -146,7 +147,7 @@ def write_to_file(dr, txt):
 ****************** End of Weekly Report *********************
 '''
 
-    with open(filename, 'w') as f:
+    with open(dirname+filename, 'w') as f:
         f.write(txt + ftr)
 
 def commandLine(argv):
@@ -204,8 +205,9 @@ if __name__=='__main__':
                 port=3306, user=os.environ['SDBUSER'], 
                 passwd=os.environ['SDBPASS'], db='sdb')
 
-    date = '2015-03-16'
-    interval = 7
+    obsdate = sys.argv[1]
+    date = '{}-{}-{}'.format(obsdate[0:4], obsdate[4:6], obsdate[6:8])
+    interval = sys.argv[2]
 
     # use the connection to get the required data: _d
     dr_d = rq.date_range(mysql_con, date, interval=7)

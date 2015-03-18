@@ -9,6 +9,7 @@ case things change in the future should prevent issues with the pis chart
 colours
 
 """
+import sys
 import os
 import pandas as pd
 import pandas.io.sql as psql
@@ -197,7 +198,6 @@ def weekly_time_breakdown(x, ds):
 
 
 if __name__=='__main__':
-    import os
     # set the colours for all the subsystems:
     subsystems_list = ['BMS', 'DOME', 'TC', 'PMAS', 'SCAM', 'TCS', 'STRUCT',
                        'TPC', 'HRS', 'PFIS','Proposal', 'Operations',
@@ -215,8 +215,9 @@ if __name__=='__main__':
                 port=3306,user=os.environ['SDBUSER'], 
                 passwd=os.environ['SDBPASS'], db='sdb')
 
-    date = '2015-03-16'
-    interval = 105
+    obsdate = sys.argv[1]
+    date = '{}-{}-{}'.format(obsdate[0:4], obsdate[4:6], obsdate[6:8])
+    interval = sys.argv[2]
 
     # use the connection to get the required data: _d
     dr_d = rq.date_range(mysql_con, date, interval=7)

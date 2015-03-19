@@ -19,6 +19,8 @@ import mysql
 import report_queries as rq
 import sdb_utils as su
 
+from create_night_table import create_night_table
+
 def night_summary_page(obsdate, sdb, els, dirname='./logs/'):
     """Create a summary for the given observing date
 
@@ -68,16 +70,44 @@ def night_summary_page(obsdate, sdb, els, dirname='./logs/'):
     night_txt += info_txt
 
     # display the night break down
-    break_txt = '<h3> Night Breakdown</h2>'
-    #break_txt += create_night_table(obsdate, sdb, els)
-  
+    break_txt = '<h3> Night Breakdown</h3>'
+    break_txt += create_night_table(obsdate, sdb, els)
+    print break_txt
     night_txt += break_txt
+
     # add a list of accecpted blocks
 
     # add a list of proposals and files for each proposal
+    data_txt = data_breakdown(sdb, obsdate)
+    night_txt += data_txt 
 
     #write the results to the output
     write_night_report_to_file(obsdate, night_txt, dirname)
+
+def data_breakdown(sdb, obsdate):
+    """Produce a list of the data associated with each proposal 
+       observed that night
+    """
+    data_txt = '<h3> Data Files</h3>'
+
+    data_txt += '<table border=1>\n'
+    table =  'FileData join ProposalCode using (ProposalCode_Id)'
+    logic = 'FileName like "%{}%"'.format(obsdate)
+    print logic
+    propcodes = sdb.select('Distinct(Proposal_Code)', table, logic)
+    for pid in propcodes:
+        pid = pid[0]
+        if not pid.count("CAL_") and not pid.count("ENG_") and not pid in ['JUNK', 'NONE']:
+           flogic = logic + ' and Proposal_Code = "{}"'.format(pid)
+           flogic += ' Order by FileName'
+           record = sdb.select('FileName, Proposal_Code, INSTRUME, Target_Name', table, flogic)
+           data_txt+= '<tr colspan=4><td><b>{}</b></td></tr>'.format(pid)
+           for r in record:
+               data_txt +='<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(r[0], r[1], r[2], r[3])
+               print r
+
+    data_txt += '</table>\n'
+    return data_txt
     
 
 
@@ -125,6 +155,12 @@ if __name__=='__main__':
     password=os.environ['SDBPASS']
     sdb=mysql.mysql(sdbhost, sdbname, user, password, port=3306)
 
+    elshost='db.suth.saao.ac.za'
+    elsname='els'
+    elsuser=os.environ['ELSUSER']
+    elspassword=os.environ['ELSPASS']
+    els=mysql.mysql(elshost, elsname, elsuser, elspassword, port=3306)
+
 
     obsdate = sys.argv[1]
     date = '{}-{}-{}'.format(obsdate[0:4], obsdate[4:6], obsdate[6:8])
@@ -145,6 +181,6 @@ if __name__=='__main__':
     #wsb_d.save('wsb_d')
 
     #create the page
-    night_summary_page(obsdate, sdb, mysql_con)
+    night_summary_page(obsdate, sdb, els)
 
     mysql_con.close()

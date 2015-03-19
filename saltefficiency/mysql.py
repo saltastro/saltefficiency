@@ -17,8 +17,8 @@ class mysql:
 
    """
    
-   def __init__(self, host,dbname,user,passwd):
-        self.db = MySQLdb.connect(host=host,db=dbname,user=user,passwd=passwd)
+   def __init__(self, host,dbname,user,passwd, port=None):
+        self.db = MySQLdb.connect(host=host,db=dbname,user=user,passwd=passwd, port=port)
 
    @classmethod
    def fromuri(cls, uri):

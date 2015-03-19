@@ -116,6 +116,8 @@ def blockvisitstats(sdb, obsdate, update=True):
                     
   
        #determine statistics associated with accepted block
+       print propcode, bid
+       print pid_list
        if propcode in pid_list and bid is not None:
            #print bid, propcode
            #deal with accepted blocks
@@ -140,6 +142,7 @@ def blockvisitstats(sdb, obsdate, update=True):
            #print bvid
            #print starttime, endtime, propcode, target, bid, bvid, slewtime, acqtime, scitime, tottime
            #upload results to sdb 
+           print propcode, bvid, slewtime, aqctime, scitime
            if bvid is not None and update:
                inscmd='TotalSlewTime=%i, TotalAcquisitionTime=%i, TotalScienceTime=%i' % (slewtime.seconds, acqtime.seconds, scitime.seconds)
                sdb.update(inscmd, 'BlockVisit', 'BlockVisit_Id=%i' % bvid)

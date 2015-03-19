@@ -82,42 +82,41 @@ def blockvisitstats(sdb, obsdate, update=True):
    for r in event_list:
        if r[0]==3: point_list.append(r[1])
 
-   for b in blocks: 
-       if b[1]==3: blocks.remove(b)
+   #for b in blocks: if b[1]==3: blocks.remove(b)
 
    #now loop through that list and associate each pointing with a blocks
    block_list=[]
    blocks_orig = list(blocks)
+   print blocks
    for point in point_list:
        starttime=point
        endtime=findnextpointing(starttime, event_list, etime)
        #now find any date sets that might be associated with this date and time
        #and the data and times 
        propcode, target, bid, instr, obsmode, detmode, exptime, nexposure = finddata(img_list, starttime, endtime)
+       bvid = get_blockvisitfrompointtime(sdb, starttime, propcode)
        #print propcode, target, bid, instr, obsmode, detmode, exptime, nexposure
        #print starttime, endtime, propcode, target
        if propcode in pid_list and not (propcode in rej_list): 
            blocks = removepropcode(blocks, propcode)
-           block_list.append([starttime, endtime, 0])
+           block_list.append([bvid, starttime, endtime, 0, propcode])
        elif propcode in rej_list and not (propcode in pid_list):
            status = getblockrejectreason(sdb, propcode, blocks)
-           block_list.append([starttime, endtime, status])
+           block_list.append([bvid, starttime, endtime, status, propcode])
        elif propcode in pid_list and propcode in rej_list:
            #get the first block with the propcode
            for b in blocks:
-               if b[2]==propcode:
+               if b[0]==bvid:
                   if b[1]==1:
                      status=0
                   else:
                      status = getblockrejectreason(sdb, propcode, blocks)
                   #print starttime, endtime, propcode, target, bid, status
-                  block_list.append([starttime, endtime, status])
-                  break
+                  block_list.append([bvid, starttime, endtime, status, propcode])
+                  #blocks = removepropcode(blocks, propcode)
                     
   
        #determine statistics associated with accepted block
-       print propcode, bid
-       print pid_list
        if propcode in pid_list and bid is not None:
            #print bid, propcode
            #deal with accepted blocks
@@ -142,7 +141,7 @@ def blockvisitstats(sdb, obsdate, update=True):
            #print bvid
            #print starttime, endtime, propcode, target, bid, bvid, slewtime, acqtime, scitime, tottime
            #upload results to sdb 
-           print propcode, bvid, slewtime, aqctime, scitime
+           #print propcode, bvid, slewtime, acqtime, scitime
            if bvid is not None and update:
                inscmd='TotalSlewTime=%i, TotalAcquisitionTime=%i, TotalScienceTime=%i' % (slewtime.seconds, acqtime.seconds, scitime.seconds)
                sdb.update(inscmd, 'BlockVisit', 'BlockVisit_Id=%i' % bvid)
@@ -167,6 +166,16 @@ def removepropcode(blocks, propcode):
            blocks.remove(b)
            return blocks
     return blocks
+
+def get_blockvisitfrompointtime(sdb, starttime, propcode=None):
+    table = 'PointEvent join SoLogEvent using (SoLogEvent_Id)'
+    logic = 'EventTime="{}"'.format(starttime)
+    if propcode is not None and propcode!='JUNK' and not propcode.count("CAL_") and not propcode.count("ENG_"): 
+        logic += ' and Proposal_Code="{}"'.format(propcode)
+    print sdb.select('BlockVisit_Id', table, logic)
+    print starttime, propcode
+    return sdb.select('BlockVisit_Id', table, logic)[0][0]
+
 
 def getblockrejectreason(sdb, propcode, blocks):
     """Get the reason for the block rejection"""

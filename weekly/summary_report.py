@@ -306,15 +306,13 @@ def write_to_file(dr, txt, dirname='./logs/'):
 
 if __name__=='__main__':
 
+    # parse line arguments
+    date, interval = parse_commandline(sys.argv[1:])
+
     # open mysql connection to the sdb
     mysql_con = MySQLdb.connect(host='sdb.cape.saao.ac.za',
                 port=3306, user=os.environ['SDBUSER'],
                 passwd=os.environ['SDBPASS'], db='sdb')
-
-#    obsdate = sys.argv[1]
-#    date = '{}-{}-{}'.format(obsdate[0:4], obsdate[4:6], obsdate[6:8])
-#    interval = sys.argv[2]
-    date, interval = parse_commandline(sys.argv[1:])
 
     # use the connection to get the required data: _d
     dr_d = rq.date_range(mysql_con, date, interval=interval)
@@ -324,11 +322,11 @@ if __name__=='__main__':
     wsb_d = rq.weekly_subsystem_breakdown(mysql_con, date, interval=interval)
 
     # TESTING: save the dataframes
-    dr_d.save('dr_d')
-    wpb_d.save('wpd_d')
-    wtb_d.save('wtb_d')
-    wttb_d.save('wttd_d')
-    wsb_d.save('wsb_d')
+#    dr_d.save('dr_d')
+#    wpb_d.save('wpd_d')
+#    wtb_d.save('wtb_d')
+#    wttb_d.save('wttd_d')
+#    wsb_d.save('wsb_d')
 
 
     # format the string needed to print and write to file: _t

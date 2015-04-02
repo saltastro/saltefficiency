@@ -10,6 +10,8 @@ from astropy.cosmology import WMAP7
 import astropy.units as u
 from astropy.constants import G
 
+import datetime as dt
+
 #Calculate and plot the luminsoity/size for the catalog
 
 x1=0.0
@@ -81,6 +83,30 @@ def plotdata(ax, name,norm=False, alpha=1.0, color='#000000', marker='o' ):
 
            return
 
+def plot_projection(ax, name='SALT-11'):
+    lines = open('telescopes.data').readlines()
+    l = lines[0].split()
+    years = np.array([int(x) for x in l[1:17]])
+
+    for l in lines[1:]:
+        l = l.split()
+        if l[0] == name:
+           npapers = np.array([float(x) for x in l[1:17]])
+           print npapers
+           ntel = float(l[18])
+           y = int(l[19])
+           c = float(l[20])
+           print name, ntel, y, c
+           y = years-y
+           mask = (y<9) * (y>=0) * (npapers > 0)
+
+    m = dt.datetime.now().timetuple().tm_yday
+    n1 = npapers[-2]
+    n2 = npapers[-1]
+    print 'Test ', m, y[-2],y[-1], [n1, n2*365/m]
+    ax.plot([y[-2],y[-1]], [n1, n2*365/m], ls='--',alpha=1.0, color='#FF0000', marker='o', mfc='#FFFFFF', mec='#FF0000')
+
+
 def plot_telpapers():
    ax = axes([0.15, 0.55, 0.8, 0.4])
    xlab='Age [year]'
@@ -91,7 +117,7 @@ def plot_telpapers():
    plotdata(ax, 'Subaru', norm=False, alpha=0.5, color='#777777', marker='p')
    plotdata(ax, 'HET', norm=False, alpha=0.5, color='#777777', marker='d')
    plotdata(ax, 'SALT', norm=False, alpha=1.0, color='#000000', marker='o')
-   ax.plot([2, 3], [34, 10*12/3.], ls='--',alpha=1.0, color='#FF0000', marker='o', mfc='#FFFFFF', mec='#FF0000')
+   plot_projection(ax, 'SALT-11')
    plotdata(ax, 'SALT-11', norm=False, alpha=1.0, color='#FF0000', marker='o')
 
    ax.axis([-0.5, 10, 0, 100])

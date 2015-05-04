@@ -143,7 +143,8 @@ def create_row(sdb, sid, eid, night_dict, night, obsdate):
     if status==1: fgcolor='#FFFFFF'
     row_str='<tr height={5}><td>{0}<br>{1}</td><td bgcolor="{2}"><font color="{4}">{3}</font></td>'.format(t1, t2, night.color_list[status], night.statusname_list[status], fgcolor, 50*l)
     row_str+='<td>{0}</td>'.format(length)
-    if status==1:
+    if status==1 and block_time is not None:
+       print block_time
        b = night_dict[block_time][1]
        print b
        row_str+='<td>{0}</td>'.format(b[4])
@@ -268,7 +269,7 @@ class Night:
        for t1,t2 in problems_list:
            t1=t1/3600.0
            t2=t2/3600.0
-           if t1 > self.stime and t1 < self.etime:
+           if t1 < self.etime and t2 > self.stime:
               et2 = min(t2, self.etime)
               self.problemtime += et2-t1
               mask = (self.time_arr>t1)*(self.time_arr<t2)

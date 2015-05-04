@@ -76,6 +76,8 @@ def night_summary_page(obsdate, sdb, els, dirname='./logs/'):
     night_txt += break_txt
 
     # add a list of accecpted blocks
+    block_txt = block_breakdown(sdb, obsdate)
+    night_txt += block_txt
 
     # add a list of proposals and files for each proposal
     data_txt = data_breakdown(sdb, obsdate)
@@ -83,6 +85,34 @@ def night_summary_page(obsdate, sdb, els, dirname='./logs/'):
 
     #write the results to the output
     write_night_report_to_file(obsdate, night_txt, dirname)
+
+def block_breakdown(sdb, obsdate):
+    """Produce a list of blocks observed on that night
+    """
+    block_txt = '<h3> Blocks</h3>'
+
+    nid = su.getnightinfo(sdb, obsdate)
+
+    #get info about blocks that night
+    select = 'BlockVisit_Id, Block_Id, Proposal_Code,  Accepted, TotalSlewTime, TotalAcquisitionTime, TotalScienceTime, ObsTime, RejectedReason' 
+    table = 'BlockVisit join Block using (Block_Id) join Proposal using (Proposal_Id) join ProposalCode using (ProposalCode_Id) left join BlockRejectedReason using (BlockRejectedReason_Id)'
+    logic = 'NightInfo_Id = {}'.format(nid)
+    record = sdb.select(select, table, logic)
+
+    block_txt += '<table border=1>\n'
+    block_txt += '<tr><th>BlockVisit</th><th>Block</th><th>Proposal Code</th>'
+    block_txt += '<th>Accepted</th><th>Slew</th><th>Acquisition</th><th>Science</th><th>Charged</th><th>Ratio</th><th>Comment</th><tr>'
+    for r in record:
+        acc = 'No'
+        if r[3]==1: acc='yes'
+        block_txt += '<tr><td>{0}</td>><td>{1}</td>><td>{2}</td><td>{3}</td>'.format(r[0], r[1], r[2], acc)
+        ratio = 0
+        block_txt += '<td>{0}</td><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td>'.format(r[4], r[5], r[6], r[7], ratio)
+        block_txt += '</tr>\n'
+        print r
+ 
+    block_txt += '</table>\n'
+    return block_txt
 
 def data_breakdown(sdb, obsdate):
     """Produce a list of the data associated with each proposal 
@@ -93,7 +123,6 @@ def data_breakdown(sdb, obsdate):
     data_txt += '<table border=1>\n'
     table =  'FileData join ProposalCode using (ProposalCode_Id)'
     logic = 'FileName like "%{}%"'.format(obsdate)
-    print logic
     propcodes = sdb.select('Distinct(Proposal_Code)', table, logic)
     for pid in propcodes:
         pid = pid[0]
@@ -104,7 +133,6 @@ def data_breakdown(sdb, obsdate):
            data_txt+= '<tr colspan=4><td><b>{}</b></td></tr>'.format(pid)
            for r in record:
                data_txt +='<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>'.format(r[0], r[1], r[2], r[3])
-               print r
 
     data_txt += '</table>\n'
     return data_txt

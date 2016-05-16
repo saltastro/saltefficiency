@@ -2,7 +2,6 @@
 import os, sys
 import numpy
 import string
-import pyfits
 from pylab import *
 from matplotlib.ticker import MultipleLocator
 
@@ -59,20 +58,18 @@ def makeplot(yc, ytext, logy=False, dy=0.8):
 
     if yc > 0.15: msax.set_xticklabels([])
 
-def plotdata(ax, name,norm=False, alpha=1.0, color='#000000', marker='o' ):
+def plotdata(ax, name,norm=False, alpha=1.0, color='#000000', marker='o', iy=18 ):
     lines = open('telescopes.data').readlines()
     l = lines[0].split()
-    years = np.array([int(x) for x in l[1:17]])
+    years = np.array([int(x) for x in l[1:iy]])
 
     for l in lines[1:]:
         l = l.split()
         if l[0] == name:
-           npapers = np.array([float(x) for x in l[1:17]])
-           print npapers
-           ntel = float(l[18])
-           y = int(l[19])
-           c = float(l[20])
-           print name, ntel, y, c
+           npapers = np.array([float(x) for x in l[1:iy]])
+           ntel = float(l[iy+1])
+           y = int(l[iy+2])
+           c = float(l[iy+3])
            y = years-y
            mask = (y<9) * (y>=0) * (npapers > 0)
            if norm and c<0:  return
@@ -83,21 +80,23 @@ def plotdata(ax, name,norm=False, alpha=1.0, color='#000000', marker='o' ):
 
            return
 
-def plot_projection(ax, name='SALT-11'):
+def plot_projection(ax, name='SALT-11', iy=18):
     lines = open('telescopes.data').readlines()
     l = lines[0].split()
-    years = np.array([int(x) for x in l[1:17]])
+    years = np.array([int(x) for x in l[1:iy]])
 
     for l in lines[1:]:
         l = l.split()
         if l[0] == name:
-           npapers = np.array([float(x) for x in l[1:17]])
+           npapers = np.array([float(x) for x in l[1:iy]])
            print npapers
-           ntel = float(l[18])
-           y = int(l[19])
-           c = float(l[20])
+           ntel = float(l[iy+1])
+           y = int(l[iy+2])
+           c = float(l[iy+3])
            print name, ntel, y, c
+           print npapers
            y = years-y
+           print y
            mask = (y<9) * (y>=0) * (npapers > 0)
 
     m = dt.datetime.now().timetuple().tm_yday
